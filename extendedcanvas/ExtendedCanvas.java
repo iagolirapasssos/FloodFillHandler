@@ -29,7 +29,7 @@ public class ExtendedCanvas extends AndroidNonvisibleComponent {
     @SimpleFunction(description = "Perform flood fill from a point with a specified color. "
     		+ "A spacing value of 1 will fill every adjacent point (as it was originally doing), "
     		+ " while a higher value will leave more space between the filled points, creating a sparser fill pattern.")
-    public void floodFillDensity(
+    public void FloodFillDensity(
     		final int x, 
     		final int y, 
     		final int newColor, 
@@ -48,7 +48,7 @@ public class ExtendedCanvas extends AndroidNonvisibleComponent {
     		+ " while a higher value will leave more space between the filled points, creating a sparser fill pattern.\n"
     		+ "For example, a pointSize of 1 will paint a 3x3 pixel square (the center point plus one pixel in each direction). "
     		+ "Adjust this value as needed to get the desired dot size")
-    public void floodFillPontSizeDensity(
+    public void FloodFillPontSizeDensity(
     		final int x, 
     		final int y, 
     		final int newColor, 
@@ -64,7 +64,7 @@ public class ExtendedCanvas extends AndroidNonvisibleComponent {
     }
     
     @SimpleFunction(description = "Perform flood fill from a point with a specified color.")
-    public void floodFillCircle(
+    public void FloodFillCircle(
     		final int x, 
     		final int y, 
     		final int newColor, 
@@ -74,6 +74,20 @@ public class ExtendedCanvas extends AndroidNonvisibleComponent {
             @Override
             public void run() {
             	floodFillHandler.floodFillCircle(x, y, newColor, radius, canvasComponent); // Now the canvas reference is passed correctly
+		    }
+		}).start();
+    }
+    
+    @SimpleFunction(description = "Perform flood fill from a point with a specified color.")
+    public void FastFloodFill(
+    		final int x, 
+    		final int y, 
+    		final int newColor) 
+    {
+    	new Thread(new Runnable() {
+            @Override
+            public void run() {
+            	floodFillHandler.fastFloodFill(x, y, newColor, canvasComponent); // Now the canvas reference is passed correctly
 		    }
 		}).start();
     }

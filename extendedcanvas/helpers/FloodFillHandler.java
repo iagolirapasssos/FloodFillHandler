@@ -17,6 +17,57 @@ public class FloodFillHandler {
         this.view = canvas.getView();
     }
     
+    public void fastFloodFill(int x, int y, int newColor, Canvas canvas) {
+        if (canvas == null) {
+            return;
+        }
+
+        int width = canvas.Width();
+        int height = canvas.Height();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        this.view.invalidate();
+        
+     // Copies the current state of the Canvas to the Bitmap
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int color = canvas.GetPixelColor(i, j);
+                bitmap.setPixel(i, j, color);
+            }
+        }
+
+        int targetColor = bitmap.getPixel(x, y);
+        int oldColor = canvas.PaintColor();
+        
+        if (targetColor == newColor) {
+            return; // Nenhuma mudança necessária se a cor de destino for a mesma que a nova cor
+        }
+
+        Queue<Point> queue = new LinkedList<>();
+        queue.add(new Point(x, y));
+        
+        canvas.PaintColor(newColor);
+        while (!queue.isEmpty()) {
+            Point p = queue.remove();
+            if (p.x < 0 || p.x >= width || p.y < 0 || p.y >= height) {
+                continue;
+            }
+
+            if (p.x >= 0 && p.x < width && p.y >= 0 && p.y < height && bitmap.getPixel(p.x, p.y) == targetColor) {
+                bitmap.setPixel(p.x, p.y, newColor);
+                canvas.DrawCircle(p.x, p.y, 1, true);
+
+                // Adicionar pontos adjacentes à fila
+                queue.add(new Point(p.x - 1, p.y));
+                queue.add(new Point(p.x + 1, p.y));
+                queue.add(new Point(p.x, p.y - 1));
+                queue.add(new Point(p.x, p.y + 1));
+            }
+        }
+
+        // Atualiza o canvas com o bitmap modificado
+        canvas.PaintColor(oldColor);
+    }
+    
     public void floodFillCircle(int x, int y, int newColor, float radius, Canvas canvas) {
         Log.d("ExtendedCanvas", "Starting floodFill"); // Log to start the flood fill
         if (canvas == null) {
