@@ -31,6 +31,39 @@ Executes a flood fill from the point `(x, y)` with a specified `density`. This m
 
 Combines point size and density parameters to perform a flood fill. This method is particularly useful when a more granular control over the flood fill pattern and spread is required.
 
+### Memory and Recycling
+
+- Bitmap Re-creation: After clearing the memory with clearMemory(), this.bitmap is set to null. Therefore, before using this.bitmap again (for example, in saveCurrentState() or fastFloodFill()), you need to recreate it if it is null.
+- Conditional Recycling: In saveCurrentState(), before recycling the last state of the undoStack stack, it checks if it is not the same as this.bitmap to avoid recycling a bitmap that is still in use.
+
+### Issue Addressed
+
+The original code faced issues with recycled bitmaps, especially when attempting to repaint the same area multiple times. This led to runtime errors due to the use of bitmaps that had already been recycled.
+
+**Key Improvements:**
+
+1. **Modified `saveCurrentState` Method:**
+   - The method now creates a copy of the current bitmap state before pushing it onto the undo stack.
+   - This change prevents the recycling of the bitmap currently in use, which was causing the error when trying to repaint the same area.
+
+2. **Improved Bitmap Management:**
+   - Additional checks were implemented to ensure that a bitmap is not recycled if it's still in use or might be used again soon.
+   - The code now carefully manages the lifecycle of bitmaps, especially when dealing with undo and redo stacks.
+
+3. **Stack Management:**
+   - The undo and redo stacks now handle bitmap states more reliably. When a state is pushed to the stack, it's a fresh copy, ensuring the original bitmap can be safely used or recycled without affecting the stack's integrity.
+
+4. **Handling Recycled Bitmaps:**
+   - Introduced checks for `isRecycled()` on bitmaps before their use to prevent runtime errors.
+   - If a bitmap is found to be recycled when it's needed, the code now handles the scenario by creating a new bitmap.
+
+5. **Optimizations for Performance and Memory Usage:**
+   - Suggested optimizations to reduce memory consumption by reusing bitmaps where possible.
+   - Advised on monitoring the quantity of bitmaps in memory to avoid `OutOfMemoryError`.
+
+These improvements aim to enhance the application's stability, particularly when performing repetitive bitmap operations such as repainting the same area multiple times.
+
+
 ## Usage
 
 To use the `FloodFillHandler` in your Android project:
